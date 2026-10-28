@@ -1,0 +1,213 @@
+---
+import Icon from "./Icon.astro";
+import { serviceOptions } from "../data/services";
+import { hours, locations, site } from "../data/site";
+
+const mapSrc = "https://maps.google.com/maps?q=Rytikatu%203%2C%2094830%20Kemi&z=15&output=embed";
+const successText =
+  site.formMode === "mailto"
+    ? "Viesti on valmis lähetettäväksi. Lähetä se avautuvasta sähköpostiohjelmasta, niin se tulee perille."
+    : "Kiitos. Viesti on lähetetty, ja siihen vastataan pian.";
+---
+
+<section id="yhteystiedot" class="reveal bg-paper py-20 sm:py-24">
+  <div class="mx-auto max-w-7xl px-5 sm:px-8">
+    <p class="font-display text-sm font-semibold uppercase tracking-[0.24em] text-safety-deep">06 — Yhteystiedot</p>
+    <h2 class="mt-3 max-w-3xl font-display text-4xl font-bold uppercase leading-none sm:text-6xl">
+      Pyydä tarjous tai soita suoraan
+    </h2>
+    <p class="mt-4 max-w-2xl text-muted">
+      Kerro työ lyhyesti. Arkisin halli ja toimisto päivystävät kahdeksasta neljään. Lauantaina ja sunnuntaina aika sovitaan soittamalla.
+    </p>
+
+    <div class="mt-10 grid gap-6 lg:grid-cols-5">
+      <div class="space-y-4 lg:col-span-2">
+        {
+          locations.map((place) => (
+            <article class="rounded-md border border-line bg-white p-5">
+              <h3 class="font-display text-2xl font-bold uppercase leading-none">{place.name}</h3>
+              <p class="mt-3 flex gap-2 text-sm leading-relaxed">
+                <Icon name="pin" class="mt-0.5 size-4 shrink-0 text-safety-deep" />
+                <span>
+                  {place.street}
+                  <br />
+                  {place.city}
+                </span>
+              </p>
+              <p class="mt-3 text-sm leading-relaxed text-muted">{place.note}</p>
+            </article>
+          ))
+        }
+
+        <article class="rounded-md border border-line bg-white p-5">
+          <h3 class="font-display text-2xl font-bold uppercase leading-none">Aukiolo ja yhteys</h3>
+          <ul class="mt-3 space-y-2 text-sm">
+            {
+              hours.map((row) => (
+                <li class="flex items-center justify-between gap-4">
+                  <span class="inline-flex items-center gap-2">
+                    <Icon name="clock" class="size-4 text-safety-deep" />
+                    {row.days}
+                  </span>
+                  <span class="font-medium">{row.time}</span>
+                </li>
+              ))
+            }
+          </ul>
+          <p class="mt-4">
+            <a href={`tel:${site.phoneTel}`} class="font-semibold text-safety-deep underline underline-offset-2">{site.phoneDisplay}</a>
+          </p>
+          <p class="mt-1">
+            <a href={`mailto:${site.email}`} class="break-all font-semibold text-safety-deep underline underline-offset-2">{site.email}</a>
+          </p>
+          <p class="mt-3 text-sm text-muted">
+            Kielet: {site.languages.join(", ")}.
+          </p>
+        </article>
+      </div>
+
+      <div class="rounded-md bg-ink p-6 text-paper sm:p-8 lg:col-span-3">
+        <h3 class="font-display text-3xl font-bold uppercase leading-none text-white">Tarjouspyyntö</h3>
+        <form
+          class="mt-6 grid gap-4"
+          name="tarjouspyynto"
+          method="POST"
+          data-contact-form
+          data-mode={site.formMode}
+          data-endpoint={site.formEndpoint}
+          data-email={site.email}
+          data-netlify={site.formMode === "netlify" ? "true" : undefined}
+          netlify-honeypot={site.formMode === "netlify" ? "bot-field" : undefined}
+          action={
+            site.formMode === "formspree"
+              ? site.formEndpoint
+              : site.formMode === "mailto"
+                ? `mailto:${site.email}`
+                : undefined
+          }
+          enctype={site.formMode === "mailto" ? "text/plain" : undefined}
+        >
+          <input type="hidden" name="form-name" value="tarjouspyynto" />
+          <p class="absolute -left-[9999px]" aria-hidden="true">
+            <label>
+              Älä täytä tätä kenttää
+              <input name="bot-field" tabindex="-1" autocomplete="off" />
+            </label>
+          </p>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <label class="block text-sm font-medium">
+              Nimi
+              <input name="nimi" required autocomplete="name" class="mt-1.5 w-full rounded-md border border-white/15 bg-white px-3 py-3 text-base text-ink" />
+            </label>
+            <label class="block text-sm font-medium">
+              Puhelin
+              <input name="puhelin" required type="tel" inputmode="tel" autocomplete="tel" class="mt-1.5 w-full rounded-md border border-white/15 bg-white px-3 py-3 text-base text-ink" />
+            </label>
+          </div>
+          <label class="block text-sm font-medium">
+            Sähköposti
+            <input name="sahkoposti" required type="email" autocomplete="email" class="mt-1.5 w-full rounded-md border border-white/15 bg-white px-3 py-3 text-base text-ink" />
+          </label>
+          <label class="block text-sm font-medium">
+            Palvelu
+            <select name="palvelu" required class="mt-1.5 w-full rounded-md border border-white/15 bg-white px-3 py-3 text-base text-ink">
+              <option value="">Valitse</option>
+              {serviceOptions.map((option) => <option value={option}>{option}</option>)}
+            </select>
+          </label>
+          <label class="block text-sm font-medium">
+            Viesti
+            <textarea name="viesti" required rows="5" class="mt-1.5 w-full rounded-md border border-white/15 bg-white px-3 py-3 text-base text-ink"></textarea>
+          </label>
+          <button type="submit" class="inline-flex min-h-12 items-center justify-center rounded-md bg-safety-deep px-5 font-semibold text-white hover:bg-safety-dark">
+            Lähetä tarjouspyyntö
+          </button>
+          <p class="text-xs leading-relaxed text-paper/60">
+            Lomakkeen tiedot käytetään vain yhteydenottoon. Lue
+            <a href="/tietosuoja" class="underline underline-offset-2">tietosuojaseloste</a>.
+          </p>
+          <p data-form-error class="hidden text-sm text-safety" role="alert"></p>
+        </form>
+        <div data-form-success class="mt-6 hidden" tabindex="-1">
+          <p class="font-display text-3xl font-bold uppercase text-white">Valmista</p>
+          <p class="mt-3 text-paper/85">{successText}</p>
+          <p class="mt-4">
+            <a href={`tel:${site.phoneTel}`} class="font-semibold text-safety underline underline-offset-2">Soita {site.phoneDisplay}</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6 overflow-hidden rounded-md border border-line bg-white">
+      <div class="flex flex-col justify-between gap-2 px-5 py-4 sm:flex-row sm:items-center">
+        <p class="font-medium">Huoltohalli kartalla, Rytikatu 3, Kemi</p>
+        <a href={site.googleMapsUrl} class="text-sm font-semibold text-safety-deep underline underline-offset-2" target="_blank" rel="noopener noreferrer">
+          Avaa Google Mapsissa
+        </a>
+      </div>
+      <iframe
+        title="Huoltohalli kartalla, Rytikatu 3, Kemi"
+        src={mapSrc}
+        class="h-80 w-full border-0"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+      ></iframe>
+    </div>
+  </div>
+</section>
+
+<script>
+  const form = document.querySelector("[data-contact-form]");
+  const success = document.querySelector("[data-form-success]");
+  const error = document.querySelector("[data-form-error]");
+
+  const showSuccess = () => {
+    if (!(form instanceof HTMLFormElement) || !(success instanceof HTMLElement)) return;
+    form.classList.add("hidden");
+    success.classList.remove("hidden");
+    success.focus();
+  };
+
+  if (form instanceof HTMLFormElement && error instanceof HTMLElement) {
+    form.addEventListener("submit", async (event) => {
+      const honeypot = form.querySelector("[name='bot-field']");
+      if (honeypot instanceof HTMLInputElement && honeypot.value.trim() !== "") {
+        event.preventDefault();
+        return;
+      }
+
+      const mode = form.dataset.mode;
+      if (mode === "netlify") return;
+
+      event.preventDefault();
+      error.classList.add("hidden");
+      const data = new FormData(form);
+
+      if (mode === "formspree" && form.dataset.endpoint) {
+        try {
+          const response = await fetch(form.dataset.endpoint, {
+            method: "POST",
+            body: data,
+            headers: { Accept: "application/json" },
+          });
+          if (!response.ok) throw new Error("Lähetys epäonnistui");
+          showSuccess();
+        } catch {
+          error.textContent = "Lähetys ei onnistunut. Soita 040 769 5463 tai lähetä sähköposti.";
+          error.classList.remove("hidden");
+        }
+        return;
+      }
+
+      const nimi = String(data.get("nimi") ?? "");
+      const puhelin = String(data.get("puhelin") ?? "");
+      const sahkoposti = String(data.get("sahkoposti") ?? "");
+      const palvelu = String(data.get("palvelu") ?? "");
+      const viesti = String(data.get("viesti") ?? "");
+      const body = [`Nimi: ${nimi}`, `Puhelin: ${puhelin}`, `Sähköposti: ${sahkoposti}`, `Palvelu: ${palvelu}`, "", viesti].join("\n");
+      const email = form.dataset.email ?? "";
+      window.location.href = `mailto:${email}?subject=${encodeURIComponent(`Tarjouspyyntö – ${palvelu}`)}&body=${encodeURIComponent(body)}`;
+      showSuccess();
+    });
+  }
+</script>

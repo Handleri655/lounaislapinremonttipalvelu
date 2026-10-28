@@ -1,0 +1,111 @@
+---
+import { site, yearsOnTheJob } from "../data/site";
+
+const stats = [
+  {
+    value: String(yearsOnTheJob),
+    suffix: "+",
+    decimals: 0,
+    label: "vuotta alalla",
+    detail: `Kokemusta rakentamisesta vuodesta ${site.experienceSince}`,
+    count: true,
+  },
+  {
+    value: String(site.founded),
+    suffix: "",
+    decimals: 0,
+    label: "yritys perustettu",
+    detail: "Lounais-Lapin Remonttipalvelu Ky",
+    count: false,
+  },
+  {
+    value: "4,9",
+    suffix: "",
+    decimals: 1,
+    label: "Google-arvosana",
+    detail: `${site.reviewCount} julkista arvostelua`,
+    count: true,
+  },
+  {
+    value: "3",
+    suffix: "",
+    decimals: 0,
+    label: "maata",
+    detail: "Suomi, Ruotsi ja Norja",
+    count: true,
+  },
+];
+---
+
+<section id="luvut" class="reveal bg-ink py-16 text-paper" aria-label="Yritys lukuina">
+  <div class="mx-auto grid max-w-7xl gap-10 px-5 sm:grid-cols-2 sm:px-8 lg:grid-cols-4">
+    {
+      stats.map((stat) => (
+        <div>
+          <p class="font-display text-6xl font-bold leading-none text-white sm:text-7xl">
+            <span
+              data-count={stat.count ? stat.value.replace(",", ".") : undefined}
+              data-decimals={stat.count ? stat.decimals : undefined}
+              data-suffix={stat.suffix}
+            >
+              {stat.value}
+              {stat.suffix}
+            </span>
+          </p>
+          <p class="mt-3 font-display text-xl uppercase tracking-wide text-safety">{stat.label}</p>
+          <p class="mt-1 text-sm text-paper/70">{stat.detail}</p>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<script>
+  const nodes = document.querySelectorAll<HTMLElement>("[data-count]");
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const format = (value: number, decimals: number) =>
+    value.toFixed(decimals).replace(".", ",");
+
+  const paint = (node: HTMLElement, value: number) => {
+    const decimals = Number(node.dataset.decimals ?? "0");
+    const suffix = node.dataset.suffix ?? "";
+    node.textContent = `${format(value, decimals)}${suffix}`;
+  };
+
+  const animate = (node: HTMLElement) => {
+    const target = Number(node.dataset.count);
+    const decimals = Number(node.dataset.decimals ?? "0");
+    if (reduce || Number.isNaN(target)) {
+      paint(node, target);
+      return;
+    }
+    const start = performance.now();
+    const duration = 900;
+    const step = (now: number) => {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      paint(node, target * eased);
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+
+  if (!("IntersectionObserver" in window)) {
+    nodes.forEach((node) => animate(node));
+  } else {
+    const seen = new WeakSet<Element>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting || seen.has(entry.target)) return;
+          seen.add(entry.target);
+          animate(entry.target as HTMLElement);
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.4 },
+    );
+    nodes.forEach((node) => observer.observe(node));
+  }
+</script>

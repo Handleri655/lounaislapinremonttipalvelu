@@ -1,0 +1,21 @@
+---
+import Icon from "./Icon.astro";
+import { site } from "../data/site";
+---
+
+<div class="fixed inset-x-0 bottom-0 z-40 grid grid-cols-2 gap-2 border-t border-white/10 bg-ink p-3 lg:hidden">
+  <a
+    href={`tel:${site.phoneTel}`}
+    class="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-safety-deep font-semibold text-white"
+  >
+    <Icon name="phone" class="size-4" />
+    Soita
+  </a>
+  <a
+    href="/#yhteystiedot"
+    class="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-white font-semibold text-ink"
+  >
+    <Icon name="mail" class="size-4" />
+    Tarjous
+  </a>
+</div>

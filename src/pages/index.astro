@@ -1,0 +1,25 @@
+---
+import About from "../components/About.astro";
+import Contact from "../components/Contact.astro";
+import Facebook from "../components/Facebook.astro";
+import Hero from "../components/Hero.astro";
+import References from "../components/References.astro";
+import Reviews from "../components/Reviews.astro";
+import Services from "../components/Services.astro";
+import Stats from "../components/Stats.astro";
+import { businessSchema } from "../data/schema";
+import Layout from "../layouts/Layout.astro";
+
+const title = "Lounais-Lapin Remonttipalvelu Ky | Rakentaminen, kunnossapito ja autohuolto Kemi";
+---
+
+<Layout title={title} jsonLd={businessSchema()}>
+  <Hero />
+  <Services />
+  <Stats />
+  <About />
+  <Reviews />
+  <References />
+  <Facebook />
+  <Contact />
+</Layout>
